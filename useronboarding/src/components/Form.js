@@ -1,15 +1,17 @@
-import React,{useEffect} from "react";
-import { withFormik, Form, Field } from "formik";
+import React,{useState,useEffect} from "react";
+import { withFormik, Form, Field,FormikState } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 
 function LoginForm({ values, errors, touched, isSubmitting,users,setUsers,status }) {
+    const [emails,setEmails]=useState([])
     useEffect(()=>{
         if(status){
             setUsers([...users,status])
+            setEmails([...emails,status.email])
         }
-        console.log("users:",users,"status:",status)
-    },[status,users])
+        console.log("users:",users,"status:",status,"emails:",emails)
+    },[status])
   return (
     <Form>
       <div>
@@ -62,8 +64,8 @@ const FormikLoginForm = withFormik({
           console.log(res); // Data was created successfully and logs to console
           resetForm();
           setSubmitting(false);
-          setStatus(res)
-          
+          setStatus(res.data)
+          console.log(setStatus(res))
         })
         .catch(err => {
           console.log(err); // There was an error creating the data and logs to console
