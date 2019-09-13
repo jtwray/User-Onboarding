@@ -1,9 +1,15 @@
-import React from "react";
+import React,{useEffect} from "react";
 import { withFormik, Form, Field } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 
-function LoginForm({ values, errors, touched, isSubmitting }) {
+function LoginForm({ values, errors, touched, isSubmitting,users,setUsers,status }) {
+    useEffect(()=>{
+        if(status){
+            setUsers([...users,status])
+        }
+        console.log("users:",users,"status:",status)
+    },[status,users])
   return (
     <Form>
       <div>
@@ -23,20 +29,21 @@ function LoginForm({ values, errors, touched, isSubmitting }) {
         Accept TOS
       </label>
       
-      <button disabled={isSubmitting}>Submit</button>
+      <button type="submit" disabled={isSubmitting}>Submit</button>
     </Form>
   );
 }
 
 const FormikLoginForm = withFormik({
-  mapPropsToValues({ email,name, password, tos}) {
+  mapPropsToValues({ email, password, tos}) {
     return {
       email: email || "",
       password: password || "",
       tos: tos || false,
-     name:name||"",
+     
     };
   },
+
   validationSchema: Yup.object().shape({
     email: Yup.string()
       .email("Email not valid")
@@ -45,7 +52,7 @@ const FormikLoginForm = withFormik({
       .min(16, "Password must be 16 characters or longer")
       .required("Password is required")
   }),
-  handleSubmit(values, { resetForm, setErrors, setSubmitting }) {
+  handleSubmit(values, { resetForm, setErrors, setSubmitting,setStatus, }) {
     if (values.email === "alreadytaken@atb.dev") {
       setErrors({ email: "That email is already taken" });
     } else {
@@ -55,12 +62,16 @@ const FormikLoginForm = withFormik({
           console.log(res); // Data was created successfully and logs to console
           resetForm();
           setSubmitting(false);
+          setStatus(res)
+          
         })
         .catch(err => {
           console.log(err); // There was an error creating the data and logs to console
           setSubmitting(false);
         });
     }
+ 
+  
   }
 })(LoginForm);
 
